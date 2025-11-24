@@ -1,0 +1,211 @@
+Day 1 — Terraform Basics: Why Terraform & How It Works
+
+
+Why Terraform?
+Imagine you want to build a house.
+You can do it in two ways:
+
+1.Build using hands (manual UI clicks)
+
+“ You pick each brick, each tile → one by one.”
+This is the same as going to AWS console, clicking:
+
+Create EC2
+
+Create VPC
+
+Create Subnet
+
+Create Security Group
+…etc.
+
+It works, but there are problems:
+
+Problems with manual cloud UI
+
+You may forget one step
+
+Your friend cannot repeat EXACTLY what you did
+
+If it breaks, you can’t rebuild in 1 click
+
+You can’t version control it
+
+You can’t track changes
+
+You can’t copy the same setup to another region or account
+
+Manual work → inconsistent → slow → errors.
+
+2.Build using a blueprint (Infrastructure as Code)
+Instead of building by hand, you create a blueprint.
+
+This blueprint says:
+
+I want 1 EC2 machine of type t2.micro
+
+I want this VPC with these subnets
+
+I want this S3 bucket with this name
+
+Now you can simply:
+
+Share the blueprint
+
+Rebuild anytime
+
+Deploy automatically
+
+This is Infrastructure as Code (IaC)*.*
+
+So why Terraform when cloud providers already have IaC tools?
+All big cloud providers offer their own IaC:
+
+AWS → CloudFormation
+
+Azure → ARM templates / Bicep
+
+GCP → Deployment Manager
+
+So why do people still use Terraform?
+Because of one big reason:
+
+Terraform works with ALL clouds
+CloudFormation = only AWS
+ARM/Bicep = only Azure
+GDM = only GCP
+
+But Terraform = AWS + Azure + GCP + Kubernetes + Databases + SaaS tools + Many more.
+
+One tool to manage everything.
+Example:
+Your company uses AWS + Azure.
+Without Terraform → 2 different IaC tools, 2 languages, 2 teams.
+With Terraform → one tool, one language (HCL), one workflow.
+
+This is why Terraform became very popular
+
+How Terraform Works Internally
+Think of Terraform as a 3-step machine:
+
+Step 1: You write your blueprint (HCL files)
+Example:
+
+
+Copy
+resource "aws_s3_bucket" "mybucket" {
+  bucket = "my-demo-bucket"
+}
+This is like telling Terraform:
+“I want an S3 bucket with this name.”
+
+Step 2: Terraform compares your blueprint with real cloud (Plan step)
+Terraform does a comparison:
+
+📘 Your requested state
+vs
+☁️ Actual cloud state
+
+It shows you what will be created/changed/deleted.
+
+Example output:
+
+
+Copy
++ aws_s3_bucket.mybucket will be created
+This is Terraform saying:
+Hey! You want an S3 bucket, but it doesn’t exist.
+So I will create it.
+
+Step 3: Terraform makes the changes (Apply step)
+Terraform sends API calls to AWS/Azure/GCP.
+
+This is the key point:
+Terraform does not create resources by itself.
+It only talks to cloud APIs on your behalf.
+
+It tells the cloud:
+Please create this bucket.
+Please create this EC2 instance.
+
+Cloud responds:
+Okay, done.”
+
+A Simple Story
+
+You want to create:
+1 EC2 instance
+
+1 Security Group
+
+Without Terraform:
+You login to AWS console, click many times.
+
+With Terraform:
+You write:
+
+
+Copy
+resource "aws_instance" "web" {
+  ami           = "ami-123"
+  instance_type = "t2.micro"
+}
+
+Copy
+resource "aws_security_group" "web_sg" {
+  name = "web-sg"
+}
+Then run:
+
+
+Copy
+terraform init 
+terraform validate 
+terraform plan  
+terraform apply
+Terraform creates both automatically.
+
+Terraform Commands
+1. terraform init
+First command you run in any Terraform project
+
+Downloads required providers (AWS, Azure, etc.)
+
+Sets up the .terraform folder
+
+Does not check your code
+
+Does not talk to the cloud
+
+2. terraform validate
+Checks if your Terraform code is correct
+
+Catches syntax errors, spelling mistakes, wrong arguments
+
+Works only locally
+
+Does not talk to the cloud
+
+Run this before plan
+
+3. terraform plan
+Previews what Terraform will change
+
+Shows create/update/delete actions
+
+Checks your code
+
+Talks to the cloud to compare the real state with your desired state
+
+Safe to run — it does not modify anything
+
+4. terraform apply
+Implements the plan
+
+Actually creates/updates/destroys cloud resources
+
+Checks your code
+
+Talks to the cloud
+
+This makes real changes in your environment
