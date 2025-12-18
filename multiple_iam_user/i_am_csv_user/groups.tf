@@ -29,7 +29,7 @@ resource "aws_iam_group_membership" "managership" {
     if user.tags["JobRole"] == each.key
   ]
 
-  group = aws_iam_group.jobrole_group[each.key].name
+  group = aws_iam_group.job_role_groups[each.key].name
 }
 
 
